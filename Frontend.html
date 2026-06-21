@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>NEXUS OS</title>
+  <script src="https://cdn.jsdelivr.net/npm/vue@3/dist/vue.global.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #app {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+      padding: 40px;
+      max-width: 600px;
+      width: 90%;
+      text-align: center;
+    }
+
+    h1 {
+      color: #333;
+      margin-bottom: 20px;
+      font-size: 32px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 30px;
+      font-size: 16px;
+    }
+
+    .status {
+      background: #f0f9ff;
+      border-left: 4px solid #3498db;
+      padding: 15px;
+      text-align: left;
+      margin: 20px 0;
+      border-radius: 4px;
+    }
+
+    .status-item {
+      padding: 8px 0;
+      color: #333;
+    }
+
+    .status-item.ok {
+      color: #27ae60;
+    }
+
+    .status-item.warning {
+      color: #e67e22;
+    }
+
+    .btn {
+      background: #667eea;
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 6px;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 20px;
+      transition: background 0.3s;
+    }
+
+    .btn:hover {
+      background: #764ba2;
+    }
+
+    .modules {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 15px;
+      margin: 30px 0;
+    }
+
+    .module {
+      background: #f8f9fa;
+      padding: 15px;
+      border-radius: 8px;
+      border: 2px solid #ecf0f1;
+    }
+
+    .module-icon {
+      font-size: 28px;
+      margin-bottom: 10px;
+    }
+
+    .module-name {
+      font-weight: bold;
+      color: #333;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1>🚀 NEXUS OS</h1>
+    <p class="subtitle">Unified Business Management Platform</p>
+    
+    <div class="status">
+      <div class="status-item ok">✅ Backend: Google Apps Script</div>
+      <div class="status-item ok">✅ Database: Google Sheets</div>
+      <div class="status-item ok">✅ Frontend: Vue.js</div>
+    </div>
+
+    <p style="color: #666; margin: 20px 0;">Доступные модули:</p>
+
+    <div class="modules">
+      <div class="module">
+        <div class="module-icon">🛍️</div>
+        <div class="module-name">RETAIL</div>
+        <small>POS + Inventory</small>
+      </div>
+      <div class="module">
+        <div class="module-icon">☕</div>
+        <div class="module-name">HoReCa</div>
+        <small>Restaurant POS</small>
+      </div>
+      <div class="module">
+        <div class="module-icon">🏭</div>
+        <div class="module-name">Manufacturing</div>
+        <small>Production Control</small>
+      </div>
+    </div>
+
+    <button class="btn" @click="showStatus">
+      Status: {{ status }}
+    </button>
+  </div>
+
+  <script>
+    const { createApp } = Vue;
+
+    createApp({
+      data() {
+        return {
+          status: 'Ready ✓'
+        };
+      },
+      methods: {
+        showStatus() {
+          alert('NEXUS OS is running!\n\nModules:\n✓ Retail\n✓ HoReCa\n✓ Manufacturing');
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
