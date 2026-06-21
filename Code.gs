@@ -1,50 +1,109 @@
-// ============ NEXUS OS BACKEND ============
-// Google Apps Script - Deploy as Web App
-
-const SHEET_NAME = "NEXUS OS Database";
-
-// ============ UNIVERSAL CORE ============
+const SHEET_ID = "1dUoqQgbcAFxFw94kOf8P5vAK4ywOIxB2vSmwgDtP4yk";
 
 function doGet(e) {
-  const html = HtmlService.createHtmlOutputFromFile('Frontend');
-  return html.setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+  return HtmlService.createHtmlOutputFromFile('Frontend')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
 }
 
 function doPost(e) {
-  const data = JSON.parse(e.postData.contents);
-  const action = data.action;
-
   try {
-    if (action === "createTransaction") {
-      return createTransaction(data);
-    } else if (action === "getAnalytics") {
-      return getAnalytics(data.dateRange);
+    const data = JSON.parse(e.postData.contents);
+    const action = data.action;
+    
+    if (action === 'getProducts') {
+      return ContentService.createTextOutput(JSON.stringify(getProducts()))
+        .setMimeType(ContentService.MimeType.JSON);
+    } 
+    else if (action === 'addProduct') {
+      return ContentService.createTextOutput(JSON.stringify(addProduct(data)))
+        .setMimeType(ContentService.MimeType.JSON);
     }
-    return { error: "Unknown action" };
+    else if (action === 'createTransaction') {
+      return ContentService.createTextOutput(JSON.stringify(createTransaction(data)))
+        .setMimeType(ContentService.MimeType.JSON);
+    }
+    
+    return ContentService.createTextOutput(JSON.stringify({success: false, error: 'Unknown action'}))
+      .setMimeType(ContentService.MimeType.JSON);
   } catch (err) {
-    return { error: err.toString() };
+    return ContentService.createTextOutput(JSON.stringify({success: false, error: err.toString()}))
+      .setMimeType(ContentService.MimeType.JSON);
   }
 }
 
-// ============ CORE FUNCTIONS ============
+function getProducts() {
+  try {
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = ss.getSheetByName('Products');
+    const data = sheet.getDataRange().getValues();
+    const products = [];
+    
+    for (let i = 1; i < data.length; i++) {
+      if (data[i][0]) {
+        products.push({
+          sku: data[i][0],
+          name: data[i][1],
+          price: parseFloat(data[i][2]),
+          category: data[i][3],
+          stock: parseInt(data[i][4]),
+          barcode: data[i][5]
+        });
+      }
+    }
+    
+    return {success: true, products: products};
+  } catch (err) {
+    return {success: false, error: 'getProducts: ' + err.toString()};
+  }
+}
+
+function addProduct(data) {
+  try {
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = ss.getSheetByName('Products');
+    
+    sheet.appendRow([
+      'SKU_' + Date.now(),
+      data.name,
+      data.price,
+      data.category,
+      data.stock,
+      'BAR_' + Date.now()
+    ]);
+    
+    return {success: true, message: 'Товар добавлен успешно'};
+  } catch (err) {
+    return {success: false, error: 'addProduct: ' + err.toString()};
+  }
+}
 
 function createTransaction(data) {
-  return {
-    success: true,
-    transactionId: generateId('TXN'),
-    message: "Transaction created successfully"
-  };
-}
-
-function getAnalytics(dateRange) {
-  return {
-    totalRevenue: 250000,
-    transactionCount: 45,
-    avgTransaction: 5555,
-    uniqueCustomers: 12
-  };
-}
-
-function generateId(prefix) {
-  return prefix + '_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+  try {
+    const ss = SpreadsheetApp.openById(SHEET_ID);
+    const sheet = ss.getSheetByName('Transactions');
+    
+    // Правильное время Алматы
+    const now = new Date();
+    const almaty = Utilities.formatDate(now, 'Asia/Almaty', 'yyyy-MM-dd HH:mm:ss');
+    
+    // Правильный формат товаров
+    const itemsJson = JSON.stringify(data.items.map(item => ({
+      name: item.name,
+      price: item.price
+    })));
+    
+    sheet.appendRow([
+      'TXN_' + Date.now(),
+      almaty,
+      'sale',
+      'ORG_001',
+      itemsJson,
+      data.total,
+      'cash'
+    ]);
+    
+    return {success: true, transactionId: 'TXN_' + Date.now(), total: data.total};
+  } catch (err) {
+    return {success: false, error: 'createTransaction: ' + err.toString()};
+  }
 }
